@@ -22,6 +22,9 @@ public class Main {
 
         List<Vehicle> vehicles = dataManager.getAllVehicles();
 
+        //vehicles.forEach(System.out::println);
+
+        vehicles = dataManager.getVehiclesInPriceRange(10000, 20000);
         vehicles.forEach(System.out::println);
     }
 }
