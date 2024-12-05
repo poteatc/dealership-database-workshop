@@ -4,24 +4,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Dealership {
+    private final int id;
     private final String name; // Dealership name
     private final String address; // Dealership address
     private final String phone; // Dealership contact phone
     private final ArrayList<Vehicle> inventory; // List of vehicles available in the dealership's inventory
 
-    public Dealership(String name, String address, String phone) {
+    public Dealership(int id, String name, String address, String phone) {
+        this.id = id;
         this.name = name;
         this.address = address;
         this.phone = phone;
         this.inventory = new ArrayList<>(); // Initialize empty inventory list
     }
 
-    public Dealership() {
+    public Dealership(int id) {
+        this.id = id;
         this.name = "";
         this.address = "";
         this.phone = "";
         this.inventory = new ArrayList<>();
     }
+
+    public int getId() { return id; }
 
     public String getName() {
         return name;

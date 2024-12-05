@@ -17,7 +17,7 @@ public class UserInterface {
 
     // Initializes the dealership from file
     private void init() {
-        this.dealership = new Dealership();
+        this.dealership = new Dealership(1);
     }
 
     // Displays the user interface and handles user input

@@ -57,13 +57,13 @@ public class Vehicle {
 
     @Override
     public String toString() {
-        return String.format("%-10d %-10s %-10s %-10d %-10s %-10s %-10d %10.2f",
+        return String.format("%-10s %-10s %-10s %-10d %-10s %-10s %-10d %10.2f",
                 vin, make, model, year, vehicleType, color, odometer, price);
     }
 
     //int vin, int year, String make, String model, String vehicleType, String color, int odometer, double price
     public String toCSVFormat() {
-        return String.format("%d|%d|%s|%s|%s|%s|%d|%.2f",
+        return String.format("%s|%d|%s|%s|%s|%s|%d|%.2f",
                 vin, year, make, model, vehicleType, color, odometer, price);
     }
 }
