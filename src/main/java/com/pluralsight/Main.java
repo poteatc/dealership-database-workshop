@@ -17,14 +17,14 @@ public class Main {
         dataSource.setUsername(args[0]);
         dataSource.setPassword(args[1]);
 
-        VehicleDAOMySqlImpl dataManager = new VehicleDAOMySqlImpl(dataSource);
+        VehicleDAOMySqlImpl vehicleManager = new VehicleDAOMySqlImpl(dataSource);
         //DealershipDAOMySqlImpl dealershipDAOMySql = new Dealer
 
-        List<Vehicle> vehicles = dataManager.getAllVehicles();
+        List<Vehicle> vehicles = vehicleManager.getAllVehicles();
 
         //vehicles.forEach(System.out::println);
 
-        vehicles = dataManager.getVehiclesInPriceRange(10000, 20000);
+        vehicles = vehicleManager.getVehiclesInPriceRange(10000, 20000);
         vehicles.forEach(System.out::println);
     }
 }
