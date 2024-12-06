@@ -1,5 +1,7 @@
 package com.pluralsight;
 
+import com.pluralsight.dealership.dao.DealershipDao;
+import com.pluralsight.dealership.dao.DealershipDaoMySqlImpl;
 import com.pluralsight.dealership.dao.VehicleDAOMySqlImpl;
 import com.pluralsight.dealership.model.Vehicle;
 import com.pluralsight.dealership.view.UserInterface;
@@ -19,12 +21,14 @@ public class Main {
 
         VehicleDAOMySqlImpl vehicleManager = new VehicleDAOMySqlImpl(dataSource);
         //DealershipDAOMySqlImpl dealershipDAOMySql = new Dealer
+        DealershipDaoMySqlImpl dealershipManager = new DealershipDaoMySqlImpl(dataSource);
 
         List<Vehicle> vehicles = vehicleManager.getAllVehicles();
 
         //vehicles.forEach(System.out::println);
 
         vehicles = vehicleManager.getVehiclesInPriceRange(10000, 20000);
+        vehicles = dealershipManager.findAllVehiclesByDealership(1);
         vehicles.forEach(System.out::println);
     }
 }
