@@ -13,4 +13,6 @@ public interface VehicleDao {
     List<Vehicle> getVehiclesByColor(String color);
     List<Vehicle> getVehiclesByMileageRange(int min, int max);
     List<Vehicle> getVehiclesByType(String type);
+    void addVehicle(String vin, int year, String make, String model, String vehicleType, String color, int odometer, double price, boolean sold);
+    void removeVehicleByVin(String vin);
 }

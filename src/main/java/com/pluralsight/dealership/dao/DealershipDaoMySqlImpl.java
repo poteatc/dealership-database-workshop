@@ -25,7 +25,28 @@ public class DealershipDaoMySqlImpl implements DealershipDao {
 
     @Override
     public List<Dealership> getAllDealerships() {
-        return List.of();
+        List<Dealership> dealerships = new ArrayList<>();
+
+        String query = """
+                SELECT * FROM dealerships
+                """;
+
+        try (Connection connection = dataSource.getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+                int dealership_id = rs.getInt("dealership_id");
+                String name = rs.getString("name");
+                String address = rs.getString("address");
+                String phone = rs.getString("phone");
+
+                Dealership v = new Dealership(dealership_id, name, address, phone);
+                dealerships.add(v);
+            }
+            return dealerships;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

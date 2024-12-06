@@ -258,4 +258,35 @@ public class VehicleDAOMySqlImpl implements VehicleDao {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public void addVehicle(String vin, int year, String make, String model, String vehicleType, String color, int odometer, double price, boolean sold) {
+        String query = """
+        insert into vehicles (VIN, year, make, model, vehicle_type, color, mileage, price, sold)
+        values (?,?,?,?,?,?,?,?,?)
+        """;
+
+        try (Connection connection = dataSource.getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, vin);
+            preparedStatement.setInt(2, year);
+            preparedStatement.setString(3, make);
+            preparedStatement.setString(4, model);
+            preparedStatement.setString(5, vehicleType);
+            preparedStatement.setString(6, color);
+            preparedStatement.setInt(7, odometer);
+            preparedStatement.setDouble(8, price);
+            preparedStatement.setBoolean(9, sold);
+            int rows = preparedStatement.executeUpdate();
+            // confirm the update
+            System.out.printf("Rows updated %d\n", rows);
+            } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+        @Override
+    public void removeVehicleByVin(String vin) {
+
+    }
 }

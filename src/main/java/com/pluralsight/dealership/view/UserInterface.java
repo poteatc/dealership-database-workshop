@@ -1,24 +1,32 @@
 package com.pluralsight.dealership.view;
 
+import com.pluralsight.dealership.dao.VehicleDAOMySqlImpl;
 import com.pluralsight.dealership.model.Dealership;
 import com.pluralsight.dealership.model.Vehicle;
 import com.pluralsight.dealership.utils.ColorCodes;
 
+import javax.sql.DataSource;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 
 public class UserInterface {
     private Dealership dealership; // Reference to the dealership object
+    private VehicleDAOMySqlImpl vehicleDAOMySqlImpl;
 
-    public UserInterface() {
-        // Constructor
+    public UserInterface(DataSource dataSource) {
+        this.vehicleDAOMySqlImpl = new VehicleDAOMySqlImpl(dataSource);
     }
 
     // Initializes the dealership from file
     private void init() {
         this.dealership = new Dealership(1);
     }
+
+    public void displayDealerships() {
+
+    }
+
 
     // Displays the user interface and handles user input
     public void display() {
@@ -132,7 +140,7 @@ public class UserInterface {
         if (max == -1) return; // Exit if input is invalid
 
         // Retrieve and display vehicles in the specified price range
-        List<Vehicle> vehiclesByPrice = dealership.getVehiclesByPrice(min, max);
+        List<Vehicle> vehiclesByPrice = vehicleDAOMySqlImpl.getVehiclesInPriceRange(min, max);
         if (vehiclesByPrice.isEmpty()) {
             System.out.println("There are no vehicles within that price range...");
         } else {
@@ -151,7 +159,7 @@ public class UserInterface {
         String model = scanner.nextLine().trim().toLowerCase(); // Get model input
 
         // Retrieve and display vehicles by make and model
-        List<Vehicle> vehiclesByMakeModel = dealership.getVehiclesByMakeModel(make, model);
+        List<Vehicle> vehiclesByMakeModel = vehicleDAOMySqlImpl.getVehiclesByMakeAndModel(make, model);
         if (vehiclesByMakeModel.isEmpty()) {
             System.out.println("There are no vehicles with that make and model...");
         } else {
@@ -174,7 +182,7 @@ public class UserInterface {
         if (max == -1) return; // Exit if input is invalid
 
         // Retrieve and display vehicles in the specified year range
-        List<Vehicle> vehiclesByYear = dealership.getVehiclesByYear(min, max);
+        List<Vehicle> vehiclesByYear = vehicleDAOMySqlImpl.getVehiclesByYearRange(min, max);
         if (vehiclesByYear.isEmpty()) {
             System.out.println("There are no vehicles within those years...");
         } else {
@@ -190,7 +198,7 @@ public class UserInterface {
         String color = scanner.nextLine().trim().toLowerCase(); // Get color input
 
         // Retrieve and display vehicles by color
-        List<Vehicle> vehiclesByColor = dealership.getVehiclesByColor(color);
+        List<Vehicle> vehiclesByColor = vehicleDAOMySqlImpl.getVehiclesByColor(color);
         if (vehiclesByColor.isEmpty()) {
             System.out.println("There are no vehicles with that color...");
         } else {
@@ -213,7 +221,7 @@ public class UserInterface {
         if (max == -1) return; // Exit if input is invalid
 
         // Retrieve and display vehicles in the specified mileage range
-        List<Vehicle> vehiclesByMileage = dealership.getVehiclesByMileage(min, max);
+        List<Vehicle> vehiclesByMileage = vehicleDAOMySqlImpl.getVehiclesByMileageRange(min, max);
         if (vehiclesByMileage.isEmpty()) {
             System.out.println("There are no vehicles within that mileage range...");
         } else {
@@ -229,7 +237,7 @@ public class UserInterface {
         String type = scanner.nextLine().trim().toLowerCase(); // Get vehicle type input
 
         // Retrieve and display vehicles by type
-        List<Vehicle> vehiclesByType = dealership.getVehiclesByType(type);
+        List<Vehicle> vehiclesByType = vehicleDAOMySqlImpl.getVehiclesByType(type);
         if (vehiclesByType.isEmpty()) {
             System.out.println("There are no vehicles with that type...");
         } else {
@@ -239,7 +247,7 @@ public class UserInterface {
 
     // Retrieves and displays all vehicles in the inventory
     public void processGetAllVehiclesRequest() {
-        displayVehicles(dealership.getAllVehicles());
+        displayVehicles(vehicleDAOMySqlImpl.getAllVehicles());
     }
 
     // Handles adding a new vehicle to the dealership
@@ -247,11 +255,10 @@ public class UserInterface {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Please enter a vehicle VIN: ");
-        String input = scanner.nextLine().toLowerCase().trim();
         String vin = scanner.nextLine(); // Get VIN input
 
         System.out.println("Please enter a vehicle year: ");
-        input = scanner.nextLine().toLowerCase().trim();
+        String input = scanner.nextLine().toLowerCase().trim();
         int year = getPositiveIntegerInput(input); // Get year input
 
         System.out.println("Please enter a vehicle brand: ");
@@ -275,8 +282,9 @@ public class UserInterface {
         double price = getPositiveDoubleInput(input); // Get price input
 
         // Create and add the new vehicle to the dealership
-        Vehicle vehicle = new Vehicle(vin, year, make, model, type, color, mileage, price, false);
-        dealership.addVehicle(vehicle);
+        //Vehicle vehicle = new Vehicle(vin, year, make, model, type, color, mileage, price, false);
+        // Add new vehicle to vehicles table
+        vehicleDAOMySqlImpl.addVehicle(vin, year, make, model, type, color, mileage, price, false);
 
         System.out.println("Successfully added vehicle with vin #: " + vin);
         // Save the updated dealership data
