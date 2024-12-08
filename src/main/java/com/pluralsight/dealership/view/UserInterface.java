@@ -4,11 +4,15 @@ import com.pluralsight.dealership.dao.VehicleDAOMySqlImpl;
 import com.pluralsight.dealership.model.Dealership;
 import com.pluralsight.dealership.model.Vehicle;
 import com.pluralsight.dealership.utils.ColorCodes;
+import com.pluralsight.dealership.utils.InputValidation;
 
 import javax.sql.DataSource;
+import java.awt.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
+
+import static com.pluralsight.dealership.utils.InputValidation.getPositiveIntegerInput;
 
 public class UserInterface {
     private Dealership dealership; // Reference to the dealership object
@@ -20,7 +24,7 @@ public class UserInterface {
 
     // Initializes the dealership from file
     private void init() {
-        this.dealership = new Dealership(1);
+        //this.dealership = new Dealership(1);
     }
 
     public void displayDealerships() {
@@ -30,7 +34,7 @@ public class UserInterface {
 
     // Displays the user interface and handles user input
     public void display() {
-        init(); // Initialize the dealership
+        //init(); // Initialize the dealership
         boolean done = false; // Control variable for the main loop
         do {
             printMenuPrompt(); // Show the menu options
@@ -124,6 +128,7 @@ public class UserInterface {
         for (Vehicle v: vehicles) {
             System.out.println(v); // Print each vehicle's details
         }
+        System.out.println();
     }
 
     // Handles filtering vehicles by price range
@@ -131,12 +136,12 @@ public class UserInterface {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Please enter the minimum price: ");
         String input = scanner.nextLine().trim();
-        double min = getPositiveDoubleInput(input); // Get minimum price input
+        double min = InputValidation.getPositiveDoubleInput(input); // Get minimum price input
         if (min == -1) return; // Exit if input is invalid
 
         System.out.print("Please enter the maximum price: ");
         input = scanner.nextLine().trim();
-        double max = getPositiveDoubleInput(input); // Get maximum price input
+        double max = InputValidation.getPositiveDoubleInput(input); // Get maximum price input
         if (max == -1) return; // Exit if input is invalid
 
         // Retrieve and display vehicles in the specified price range
@@ -173,12 +178,12 @@ public class UserInterface {
 
         System.out.print("Please enter the minimum year: ");
         String input = scanner.nextLine().trim();
-        int min = getPositiveIntegerInput(input); // Get minimum year input
+        int min = InputValidation.getPositiveIntegerInput(input); // Get minimum year input
         if (min == -1) return; // Exit if input is invalid
 
         System.out.print("Please enter the maximum year: "); // Fixed typo in prompt
         input = scanner.nextLine().trim();
-        int max = getPositiveIntegerInput(input); // Get maximum year input
+        int max = InputValidation.getPositiveIntegerInput(input); // Get maximum year input
         if (max == -1) return; // Exit if input is invalid
 
         // Retrieve and display vehicles in the specified year range
@@ -212,12 +217,12 @@ public class UserInterface {
 
         System.out.print("Please enter the minimum mileage: ");
         String input = scanner.nextLine().trim();
-        int min = getPositiveIntegerInput(input); // Get minimum mileage input
+        int min = InputValidation.getPositiveIntegerInput(input); // Get minimum mileage input
         if (min == -1) return; // Exit if input is invalid
 
         System.out.print("Please enter the maximum mileage: ");
         input = scanner.nextLine().trim();
-        int max = getPositiveIntegerInput(input); // Get maximum mileage input
+        int max = InputValidation.getPositiveIntegerInput(input); // Get maximum mileage input
         if (max == -1) return; // Exit if input is invalid
 
         // Retrieve and display vehicles in the specified mileage range
@@ -259,7 +264,7 @@ public class UserInterface {
 
         System.out.println("Please enter a vehicle year: ");
         String input = scanner.nextLine().toLowerCase().trim();
-        int year = getPositiveIntegerInput(input); // Get year input
+        int year = InputValidation.getPositiveIntegerInput(input); // Get year input
 
         System.out.println("Please enter a vehicle brand: ");
         String make = scanner.nextLine(); // Get make input
@@ -275,20 +280,16 @@ public class UserInterface {
 
         System.out.println("Please enter the vehicle's mileage: ");
         input = scanner.nextLine().toLowerCase().trim();
-        int mileage = getPositiveIntegerInput(input); // Get mileage input
+        int mileage = InputValidation.getPositiveIntegerInput(input); // Get mileage input
 
         System.out.println("Please enter the vehicle's price: ");
         input = scanner.nextLine().toLowerCase().trim();
-        double price = getPositiveDoubleInput(input); // Get price input
+        double price = InputValidation.getPositiveDoubleInput(input); // Get price input
 
-        // Create and add the new vehicle to the dealership
-        //Vehicle vehicle = new Vehicle(vin, year, make, model, type, color, mileage, price, false);
         // Add new vehicle to vehicles table
         vehicleDAOMySqlImpl.addVehicle(vin, year, make, model, type, color, mileage, price, false);
 
         System.out.println("Successfully added vehicle with vin #: " + vin);
-        // Save the updated dealership data
-       // new DealershipFileManager().saveDealership(dealership);
     }
 
     // Handles removing a vehicle from the dealership
@@ -297,6 +298,8 @@ public class UserInterface {
         Scanner scanner = new Scanner(System.in);
         String vin = scanner.nextLine(); // Get VIN input
 
+
+        //TODO : Remove vehicle from database
         // Retrieve and remove the vehicle with the specified VIN from the dealership
         Vehicle filtered = dealership.getAllVehicles().stream()
                 .filter(vehicle -> vehicle.getVin().equalsIgnoreCase(vin)).toList().get(0);
@@ -309,11 +312,11 @@ public class UserInterface {
     // Helper methods
     private void printMenuPrompt() {
         // Displays the menu options to the user
-        System.out.println("""
+        System.out.print(ColorCodes.CYAN + """
                     ~~~~~~~~~~~~~~~~~~~~
                     |       Menu       |
                     ~~~~~~~~~~~~~~~~~~~~
-                    Please enter an option:
+                    """ +  ColorCodes.RESET + """
                     A) Filter vehicles by price
                     B) Filter vehicles by make and model
                     C) Filter vehicles by year
@@ -325,44 +328,16 @@ public class UserInterface {
                     I) Remove vehicle from dealership
                     J) Buy Vehicle
                     X) Exit application
+                    
+                    Please enter an option:
                     """);
     }
 
     private void printVehicleListHeader() {
         // Prints the header for the vehicle list
         System.out.println(ColorCodes.GREEN + "\nVehicles\n~~~~~~~~" + ColorCodes.RESET);
-        System.out.printf(ColorCodes.BLUE + "%-10s %-10s %-10s %-10s %-10s %-10s %-15s %5s\n",
+        System.out.printf(ColorCodes.BLUE + "%-21s %-10s %-10s %-10s %-10s %-10s %-15s %5s\n",
                 "VIN", "Make", "Model", "Year", "Type", "Color", "Mileage", "Price");
-        System.out.println("---------------------------------------------------------------------------------------" + ColorCodes.RESET);
-    }
-
-    // Validates and returns a positive double input
-    private double getPositiveDoubleInput(String input) {
-        double d = -1; // Default value indicating invalid input
-        try {
-            d = Double.parseDouble(input); // Try to parse input as double
-        } catch (NumberFormatException e) {
-            System.out.println("Please enter a floating point number (Ex. 100, 54321.09, 123.50)");
-        }
-        if (d < 0) { // Check if the input is negative
-            System.out.println("Please enter a positive number...");
-            d = -1; // Reset to default if invalid
-        }
-        return d;
-    }
-
-    // Validates and returns a positive integer input
-    private int getPositiveIntegerInput(String input) {
-        int i = -1; // Default value indicating invalid input
-        try {
-            i = Integer.parseInt(input); // Try to parse input as integer
-        } catch (NumberFormatException e) {
-            System.out.println("Please enter an integer number (Ex. 10, 987, 1234)");
-        }
-        if (i < 0) { // Check if the input is negative
-            System.out.println("Please enter a positive number...");
-            i = -1; // Reset to default if invalid
-        }
-        return i;
+        System.out.println("-".repeat(98) + ColorCodes.RESET);
     }
 }

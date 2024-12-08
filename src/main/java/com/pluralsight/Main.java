@@ -23,18 +23,18 @@ public class Main {
         UserInterface ui = new UserInterface(dataSource);
         ui.display();
 
-        VehicleDAOMySqlImpl vehicleManager = new VehicleDAOMySqlImpl(dataSource);
-        //DealershipDAOMySqlImpl dealershipDAOMySql = new Dealer
-        DealershipDaoMySqlImpl dealershipManager = new DealershipDaoMySqlImpl(dataSource);
-
-        List<Vehicle> vehicles = vehicleManager.getAllVehicles();
-
-        //vehicles.forEach(System.out::println);
-
-        vehicles = vehicleManager.getVehiclesInPriceRange(10000, 20000);
-        vehicles = dealershipManager.findAllVehiclesByDealership(1);
-        List<Dealership> dealerships = dealershipManager.getAllDealerships();
-        vehicles.forEach(System.out::println);
-        dealerships.forEach(System.out::println);
+//        VehicleDAOMySqlImpl vehicleManager = new VehicleDAOMySqlImpl(dataSource);
+//        //DealershipDAOMySqlImpl dealershipDAOMySql = new Dealer
+//        DealershipDaoMySqlImpl dealershipManager = new DealershipDaoMySqlImpl(dataSource);
+//
+//        List<Vehicle> vehicles = vehicleManager.getAllVehicles();
+//
+//        //vehicles.forEach(System.out::println);
+//
+//        vehicles = vehicleManager.getVehiclesInPriceRange(10000, 20000);
+//        vehicles = dealershipManager.findAllVehiclesByDealership(1);
+//        List<Dealership> dealerships = dealershipManager.getAllDealerships();
+//        vehicles.forEach(System.out::println);
+//        dealerships.forEach(System.out::println);
     }
 }
