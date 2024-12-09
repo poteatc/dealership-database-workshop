@@ -2,6 +2,7 @@ package com.pluralsight.dealership.view;
 
 import com.pluralsight.dealership.dao.SalesDaoMySqlImpl;
 import com.pluralsight.dealership.dao.VehicleDaoMySqlImpl;
+import com.pluralsight.dealership.model.SalesContract;
 import com.pluralsight.dealership.model.Vehicle;
 import com.pluralsight.dealership.utils.ColorCodes;
 import com.pluralsight.dealership.utils.InputValidation;
@@ -64,16 +65,35 @@ public class UserInterface {
                 case "j":
                     processVehicleContract(scanner);
                     break;
+                case "k":
+                    showSoldVehicles(scanner);
+                    break;
+                case "l":
+                    showSalesContracts(scanner);
                 case "x":
                     System.out.println("Exiting application...");
                     done = true; // Set done to true to exit the loop
                     break;
                 default:
-                    System.out.println("Please enter a valid choice (A, B, C, D, E, F, G, H, I, J, or X):");
+                    System.out.println("Please enter a valid choice (A, B, C, D, E, F, G, H, I, J, K, or X):");
                     break;
             }
 
         } while (!done); // Repeat until the user chooses to exit
+    }
+
+    private void showSalesContracts(Scanner scanner) {
+        printSalesContractsHeader();
+        for (SalesContract sc : salesDaoMySql.getAllSalesContracts()) {
+            System.out.println(sc);
+        }
+    }
+
+    private void showSoldVehicles(Scanner scanner) {
+        printVehicleListHeader();
+        for (Vehicle v : salesDaoMySql.getVehiclesSold()) {
+            System.out.println(v);
+        }
     }
 
 
@@ -302,6 +322,8 @@ public class UserInterface {
                     H) Add new vehicle to dealership
                     I) Remove vehicle from dealership
                     J) Buy Vehicle
+                    K) Show sold vehicles
+                    L) Show sales contracts
                     X) Exit application
                     
                     Please enter an option:
@@ -313,6 +335,14 @@ public class UserInterface {
         System.out.println(ColorCodes.GREEN + "\nVehicles\n~~~~~~~~" + ColorCodes.RESET);
         System.out.printf(ColorCodes.BLUE + "%-21s %-10s %-10s %-10s %-10s %-10s %-15s %5s %10s\n",
                 "VIN", "Make", "Model", "Year", "Type", "Color", "Mileage", "Price", "Sold");
+        System.out.println("-".repeat(108) + ColorCodes.RESET);
+    }
+
+    private void printSalesContractsHeader() {
+        // Prints the header for the vehicle list
+        System.out.println(ColorCodes.GREEN + "\nSales Contracts\n~~~~~~~~" + ColorCodes.RESET);
+        System.out.printf(ColorCodes.BLUE + "%-21s %-10s %-10s %-10s %-10s %-10s %-15s %5s %10s\n",
+                "VIN", "Contract Date", "Customer Name", "Customer Email", "Total Price", "Down Payment", "Taxes", "Fees", "Balance Due");
         System.out.println("-".repeat(108) + ColorCodes.RESET);
     }
 }

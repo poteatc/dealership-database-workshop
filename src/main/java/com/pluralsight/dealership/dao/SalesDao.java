@@ -1,9 +1,11 @@
 package com.pluralsight.dealership.dao;
 
+import com.pluralsight.dealership.model.SalesContract;
 import com.pluralsight.dealership.model.Vehicle;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.List;
 
 public interface SalesDao {
     double taxRate = 0.04;
@@ -15,5 +17,7 @@ public interface SalesDao {
     double calculateFees(double price);
     double calculateBalanceDue(double price, double taxes, double fees, double amountPaid);
     Vehicle getVehicleByVin(String vin);
+    List<Vehicle> getVehiclesSold();
+    List<SalesContract> getAllSalesContracts();
 
 }
