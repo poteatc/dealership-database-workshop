@@ -133,7 +133,8 @@ CREATE TABLE vehicles (
     mileage INT,
     price DOUBLE,
     sold BOOLEAN
-);```
+);
+```
 
 - sales_contracts
 - ```java
@@ -149,7 +150,8 @@ CREATE TABLE sales_contracts (
     fees DOUBLE,
     balance_due DOUBLE,
     FOREIGN KEY (vin) REFERENCES vehicles(vin)
-);```
+);
+```
 
 - lease_contracts
 - ```java
@@ -165,6 +167,30 @@ CREATE TABLE lease_contracts (
   FOREIGN KEY (vin) REFERENCES vehicles(vin)
 );
 ```
+```
+
+
+### Screenshots
+# Home Screen
+![image](https://github.com/user-attachments/assets/8fd2e482-f20d-46e5-bdac-3a5641094305)
+
+# Vehicle Display Screen
+![image](https://github.com/user-attachments/assets/5beb744f-034e-4fd0-bc4a-700092c18984)
+
+# Interesting Code
+![image](https://github.com/user-attachments/assets/e6f4da3b-5604-45a8-a002-5271b4936be4)
+
+This code is interesting for several reasons:
+
+1. Modern SQL String Handling
+The use of a multi-line string (""") for the SQL query is a modern and clean approach introduced in Java 15 with text blocks. This makes the SQL query highly readable and reduces errors related to formatting.
+2. Prepared Statements for Security
+The method uses PreparedStatement, which is a best practice in JDBC. This prevents SQL injection attacks by separating SQL logic from data values through parameterized queries (? placeholders).
+3. Effective Resource Management
+The try-with-resources statement ensures that the Connection and PreparedStatement are automatically closed after use, even if an exception occurs. This avoids resource leaks, a common pitfall in database programming.
+4. Encapsulation of Business Logic
+The method encapsulates all logic for adding a vehicle into a single function. This is a clear application of the single responsibility principle and promotes code reuse.
+
 
 
 
