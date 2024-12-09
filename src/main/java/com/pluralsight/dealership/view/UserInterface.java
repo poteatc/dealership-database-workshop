@@ -1,7 +1,9 @@
 package com.pluralsight.dealership.view;
 
+import com.pluralsight.dealership.dao.LeaseDaoSqlImpl;
 import com.pluralsight.dealership.dao.SalesDaoMySqlImpl;
 import com.pluralsight.dealership.dao.VehicleDaoMySqlImpl;
+import com.pluralsight.dealership.model.LeaseContract;
 import com.pluralsight.dealership.model.SalesContract;
 import com.pluralsight.dealership.model.Vehicle;
 import com.pluralsight.dealership.utils.ColorCodes;
@@ -17,10 +19,12 @@ import static com.pluralsight.dealership.utils.InputValidation.getPositiveIntege
 public class UserInterface {
     private final VehicleDaoMySqlImpl vehicleDaoMySql;
     private final SalesDaoMySqlImpl salesDaoMySql;
+    private final LeaseDaoSqlImpl leaseDaoSql;
 
     public UserInterface(DataSource dataSource) {
         this.vehicleDaoMySql = new VehicleDaoMySqlImpl(dataSource);
         this.salesDaoMySql = new SalesDaoMySqlImpl(dataSource);
+        this.leaseDaoSql = new LeaseDaoSqlImpl(dataSource);
     }
 
     public void displayDealerships() {
@@ -70,16 +74,27 @@ public class UserInterface {
                     break;
                 case "l":
                     showSalesContracts(scanner);
+                    break;
+                case "m":
+                    showLeaseContracts(scanner);
+                    break;
                 case "x":
                     System.out.println("Exiting application...");
                     done = true; // Set done to true to exit the loop
                     break;
                 default:
-                    System.out.println("Please enter a valid choice (A, B, C, D, E, F, G, H, I, J, K, or X):");
+                    System.out.println("Please enter a valid choice (A, B, C, D, E, F, G, H, I, J, K, M, or X):");
                     break;
             }
 
         } while (!done); // Repeat until the user chooses to exit
+    }
+
+    private void showLeaseContracts(Scanner scanner) {
+        printLeaseContractsHeader();
+        for (LeaseContract lc : leaseDaoSql.getAllLeaseContracts()) {
+            System.out.println(lc);
+        }
     }
 
     private void showSalesContracts(Scanner scanner) {
@@ -324,6 +339,7 @@ public class UserInterface {
                     J) Buy Vehicle
                     K) Show sold vehicles
                     L) Show sales contracts
+                    M) Show lease contracts
                     X) Exit application
                     
                     Please enter an option:
@@ -343,6 +359,14 @@ public class UserInterface {
         System.out.println(ColorCodes.GREEN + "\nSales Contracts\n~~~~~~~~" + ColorCodes.RESET);
         System.out.printf(ColorCodes.BLUE + "%-21s %-10s %-10s %-10s %-10s %-10s %-15s %5s %10s\n",
                 "VIN", "Contract Date", "Customer Name", "Customer Email", "Total Price", "Down Payment", "Taxes", "Fees", "Balance Due");
+        System.out.println("-".repeat(108) + ColorCodes.RESET);
+    }
+
+    private void printLeaseContractsHeader() {
+        // Prints the header for the vehicle list
+        System.out.println(ColorCodes.GREEN + "\nLease Contracts\n~~~~~~~~" + ColorCodes.RESET);
+        System.out.printf(ColorCodes.BLUE + "%-21s %-10s %-10s %-10s %-10s %-10s %10s\n",
+                "VIN", "Contract Date", "Customer Name", "Customer Email", "Total Price", "Monthly Payment", "Lease Term");
         System.out.println("-".repeat(108) + ColorCodes.RESET);
     }
 }
