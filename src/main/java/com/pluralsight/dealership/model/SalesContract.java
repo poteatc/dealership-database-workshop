@@ -65,16 +65,9 @@ public class SalesContract {
     // TODO : reformat to string
     @Override
     public String toString() {
-        return "SalesContract{" +
-                "vin='" + vin + '\'' +
-                ", contractDate=" + contractDate +
-                ", customerName='" + customerName + '\'' +
-                ", customerEmail='" + customerEmail + '\'' +
-                ", totalPrice=" + totalPrice +
-                ", amountPaid=" + amountPaid +
-                ", taxes=" + taxes +
-                ", fees=" + fees +
-                ", balanceDue=" + balanceDue +
-                '}';
+        //String vin, LocalDate contractDate, String customerName, String customerEmail,
+        //                         double totalPrice, double amountPaid, double taxes, double fees, double balanceDue
+        return String.format("%-21s %-20s %-15s %-25s %-15.2f %-20.2f %-15.2f %-15.2f %15.2f",
+                vin, contractDate, customerName, customerEmail, totalPrice, amountPaid, taxes, fees, balanceDue);
     }
 }

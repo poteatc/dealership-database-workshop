@@ -111,7 +111,6 @@ public class UserInterface {
         }
     }
 
-
     private void processVehicleContract(Scanner scanner) {
         System.out.print("Please enter the VIN # of the vehicle you want: ");
         String vin = scanner.nextLine().trim();
@@ -356,17 +355,17 @@ public class UserInterface {
 
     private void printSalesContractsHeader() {
         // Prints the header for the vehicle list
-        System.out.println(ColorCodes.GREEN + "\nSales Contracts\n~~~~~~~~" + ColorCodes.RESET);
-        System.out.printf(ColorCodes.BLUE + "%-21s %-10s %-10s %-10s %-10s %-10s %-15s %5s %10s\n",
+        System.out.println(ColorCodes.GREEN + "\nSales Contracts\n~~~~~~~~~~~~~~~" + ColorCodes.RESET);
+        System.out.printf(ColorCodes.BLUE + "%-21s %-20s %-15s %-25s %-15s %-20s %-15s %-15s %15s\n",
                 "VIN", "Contract Date", "Customer Name", "Customer Email", "Total Price", "Down Payment", "Taxes", "Fees", "Balance Due");
-        System.out.println("-".repeat(108) + ColorCodes.RESET);
+        System.out.println("-".repeat(169) + ColorCodes.RESET);
     }
 
     private void printLeaseContractsHeader() {
         // Prints the header for the vehicle list
-        System.out.println(ColorCodes.GREEN + "\nLease Contracts\n~~~~~~~~" + ColorCodes.RESET);
-        System.out.printf(ColorCodes.BLUE + "%-21s %-10s %-10s %-10s %-10s %-10s %10s\n",
+        System.out.println(ColorCodes.GREEN + "\nLease Contracts\n~~~~~~~~~~~~~~~~" + ColorCodes.RESET);
+        System.out.printf(ColorCodes.BLUE + "%-21s %-20s %-15s %-25s %-15s %-20s %-15s\n",
                 "VIN", "Contract Date", "Customer Name", "Customer Email", "Total Price", "Monthly Payment", "Lease Term");
-        System.out.println("-".repeat(108) + ColorCodes.RESET);
+        System.out.println("-".repeat(130) + ColorCodes.RESET);
     }
 }

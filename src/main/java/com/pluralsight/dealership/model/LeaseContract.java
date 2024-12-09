@@ -55,14 +55,18 @@ public class LeaseContract {
 
     @Override
     public String toString() {
-        return "LeaseContract{" +
-                "vin='" + vin + '\'' +
-                ", contractDate=" + contractDate +
-                ", customerName='" + customerName + '\'' +
-                ", customerEmail='" + customerEmail + '\'' +
-                ", totalPrice=" + totalPrice +
-                ", monthlyPayment=" + monthlyPayment +
-                ", leaseTerm=" + leaseTerm +
-                '}';
+        //String vin, LocalDate contractDate, String customerName, String customerEmail,
+        //                         double totalPrice, double monthlyPayment, int leaseTerm
+        return String.format("%-21s %-20s %-15s %-25s %-15.2f %-20.2f %-15d",
+                vin, contractDate, customerName, customerEmail, totalPrice, monthlyPayment, leaseTerm);
+//        return "LeaseContract{" +
+//                "vin='" + vin + '\'' +
+//                ", contractDate=" + contractDate +
+//                ", customerName='" + customerName + '\'' +
+//                ", customerEmail='" + customerEmail + '\'' +
+//                ", totalPrice=" + totalPrice +
+//                ", monthlyPayment=" + monthlyPayment +
+//                ", leaseTerm=" + leaseTerm +
+//                '}';
     }
 }
