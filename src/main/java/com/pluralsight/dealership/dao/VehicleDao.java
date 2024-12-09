@@ -15,4 +15,6 @@ public interface VehicleDao {
     List<Vehicle> getVehiclesByType(String type);
     void addVehicle(String vin, int year, String make, String model, String vehicleType, String color, int odometer, double price, boolean sold);
     void removeVehicleByVin(String vin);
+    boolean vehicleExists(String vin);
+    void updateVehicleSoldStatus(String vin);
 }

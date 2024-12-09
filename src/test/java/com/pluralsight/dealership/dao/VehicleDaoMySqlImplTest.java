@@ -5,8 +5,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.sql.DataSource;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,7 +12,7 @@ import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class VehicleDAOMySqlImplTest {
+class VehicleDaoMySqlImplTest {
 
     BasicDataSource ds = new BasicDataSource();
 
@@ -36,7 +34,7 @@ class VehicleDAOMySqlImplTest {
 
     @Test
     void test_getAllVehicles() {
-        VehicleDAOMySqlImpl vehicleDAOMySql = new VehicleDAOMySqlImpl(ds);
+        VehicleDaoMySqlImpl vehicleDAOMySql = new VehicleDaoMySqlImpl(ds);
         int count = vehicleDAOMySql.getAllVehicles().size();
         try (Connection connection = ds.getConnection()) {
             String query = "select COUNT(*) from vehicles";

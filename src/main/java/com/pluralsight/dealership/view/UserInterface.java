@@ -1,13 +1,12 @@
 package com.pluralsight.dealership.view;
 
-import com.pluralsight.dealership.dao.VehicleDAOMySqlImpl;
-import com.pluralsight.dealership.model.Dealership;
+import com.pluralsight.dealership.dao.SalesDaoMySqlImpl;
+import com.pluralsight.dealership.dao.VehicleDaoMySqlImpl;
 import com.pluralsight.dealership.model.Vehicle;
 import com.pluralsight.dealership.utils.ColorCodes;
 import com.pluralsight.dealership.utils.InputValidation;
 
 import javax.sql.DataSource;
-import java.awt.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
@@ -15,26 +14,20 @@ import java.util.Scanner;
 import static com.pluralsight.dealership.utils.InputValidation.getPositiveIntegerInput;
 
 public class UserInterface {
-    private Dealership dealership; // Reference to the dealership object
-    private VehicleDAOMySqlImpl vehicleDAOMySqlImpl;
+    private final VehicleDaoMySqlImpl vehicleDaoMySql;
+    private final SalesDaoMySqlImpl salesDaoMySql;
 
     public UserInterface(DataSource dataSource) {
-        this.vehicleDAOMySqlImpl = new VehicleDAOMySqlImpl(dataSource);
-    }
-
-    // Initializes the dealership from file
-    private void init() {
-        //this.dealership = new Dealership(1);
+        this.vehicleDaoMySql = new VehicleDaoMySqlImpl(dataSource);
+        this.salesDaoMySql = new SalesDaoMySqlImpl(dataSource);
     }
 
     public void displayDealerships() {
 
     }
 
-
     // Displays the user interface and handles user input
     public void display() {
-        //init(); // Initialize the dealership
         boolean done = false; // Control variable for the main loop
         do {
             printMenuPrompt(); // Show the menu options
@@ -42,34 +35,34 @@ public class UserInterface {
             String input = scanner.nextLine().toLowerCase().trim(); // Get user input
             switch (input) {
                 case "a":
-                    processGetByPriceRequest();
+                    processGetByPriceRequest(scanner);
                     break;
                 case "b":
-                    processGetByMakeModelRequest();
+                    processGetByMakeModelRequest(scanner);
                     break;
                 case "c":
-                    processGetByYearRequest();
+                    processGetByYearRequest(scanner);
                     break;
                 case "d":
-                    processGetByColorRequest();
+                    processGetByColorRequest(scanner);
                     break;
                 case "e":
-                    processGetByMileageRequest();
+                    processGetByMileageRequest(scanner);
                     break;
                 case "f":
-                    processGetByVehicleTypeRequest();
+                    processGetByVehicleTypeRequest(scanner);
                     break;
                 case "g":
-                    processGetAllVehiclesRequest();
+                    processGetAllVehiclesRequest(scanner);
                     break;
                 case "h":
-                    processAddVehicleRequest();
+                    processAddVehicleRequest(scanner);
                     break;
                 case "i":
-                    processRemoveVehicleRequest();
+                    processRemoveVehicleRequest(scanner);
                     break;
                 case "j":
-                    processVehicleContract();
+                    processVehicleContract(scanner);
                     break;
                 case "x":
                     System.out.println("Exiting application...");
@@ -84,12 +77,16 @@ public class UserInterface {
     }
 
 
-    private void processVehicleContract() {
-        Scanner scanner = new Scanner(System.in);
+    private void processVehicleContract(Scanner scanner) {
         System.out.print("Please enter the VIN # of the vehicle you want: ");
-        int vin = getPositiveIntegerInput(scanner.nextLine());
+        String vin = scanner.nextLine().trim();
+        if (!vehicleDaoMySql.vehicleExists(vin)) {
+            System.out.println("Vehicle does not exist...");
+            return;
+        }
+        Vehicle vehicle = salesDaoMySql.getVehicleByVin(vin);
 
-        String date = LocalDate.now().toString();
+        LocalDate date = LocalDate.now();
 
         System.out.print("Please enter your name: ");
         String name = scanner.nextLine().toUpperCase().trim();
@@ -100,26 +97,24 @@ public class UserInterface {
         System.out.print("Would you like to lease or buy? Enter LEASE or SALE: ");
         String contractType = scanner.nextLine().toUpperCase().trim();
 
+        double price = vehicle.getPrice();
+        double taxes = salesDaoMySql.calculateTaxes(price);
+        double fees = salesDaoMySql.calculateFees(price);
+
+
         if (!(contractType.equalsIgnoreCase("LEASE") || contractType.equalsIgnoreCase("SALE"))) {
             System.out.println("Please enter 'LEASE' or 'SALE'...");
             return;
+        } else {
+            if (contractType.equalsIgnoreCase("SALE")) {
+                System.out.print("How much would you like your initial payment to be?: ");
+                double paymentAmount = scanner.nextDouble();
+                scanner.nextLine();
+                double balanceDue = salesDaoMySql.calculateBalanceDue(price, taxes, fees, paymentAmount);
+                //String vin, Date date, String name, String email, double price, double amount, double taxes, double fees, double balanceDue
+                salesDaoMySql.addSalesContract(vin, date, name, email, price, paymentAmount, taxes, fees, balanceDue);
+            }
         }
-//        } else {
-////            Vehicle v = dealership.getAllVehicles().stream().filter(vehicle -> vehicle.getVin() == vin).toList().get(0);
-////            if (contractType.equals("SALE")) {
-////                double processingFee = v.getPrice() < 10000 ? 295 : 495;
-////                System.out.printf("Would you like to finance your new vehicle? Enter 'Y' for yes or any other key for no: ");
-////                String financingInput = scanner.nextLine().trim().toLowerCase();
-////                boolean isFinancing = financingInput.equalsIgnoreCase("y") ? true : false;
-////                Contract contract = new SalesContract(date, name, email, v, processingFee, isFinancing);
-////                new ContractDataManager().saveContract(contract);
-////                // TODO remove vehicle from dealership
-////            } else if (contractType.equals("LEASE")) {
-////                Contract contract = new LeaseContract(date, name, email, v);
-////                new ContractDataManager().saveContract(contract);
-////            }
-//        }
-
     }
 
     // Displays the list of vehicles to the user
@@ -132,8 +127,7 @@ public class UserInterface {
     }
 
     // Handles filtering vehicles by price range
-    public void processGetByPriceRequest() {
-        Scanner scanner = new Scanner(System.in);
+    public void processGetByPriceRequest(Scanner scanner) {
         System.out.print("Please enter the minimum price: ");
         String input = scanner.nextLine().trim();
         double min = InputValidation.getPositiveDoubleInput(input); // Get minimum price input
@@ -145,7 +139,7 @@ public class UserInterface {
         if (max == -1) return; // Exit if input is invalid
 
         // Retrieve and display vehicles in the specified price range
-        List<Vehicle> vehiclesByPrice = vehicleDAOMySqlImpl.getVehiclesInPriceRange(min, max);
+        List<Vehicle> vehiclesByPrice = vehicleDaoMySql.getVehiclesInPriceRange(min, max);
         if (vehiclesByPrice.isEmpty()) {
             System.out.println("There are no vehicles within that price range...");
         } else {
@@ -154,9 +148,7 @@ public class UserInterface {
     }
 
     // Handles filtering vehicles by make and model
-    public void processGetByMakeModelRequest() {
-        Scanner scanner = new Scanner(System.in);
-
+    public void processGetByMakeModelRequest(Scanner scanner) {
         System.out.print("Please enter the make (brand) of the vehicle: ");
         String make = scanner.nextLine().trim().toLowerCase(); // Get make input
 
@@ -164,7 +156,7 @@ public class UserInterface {
         String model = scanner.nextLine().trim().toLowerCase(); // Get model input
 
         // Retrieve and display vehicles by make and model
-        List<Vehicle> vehiclesByMakeModel = vehicleDAOMySqlImpl.getVehiclesByMakeAndModel(make, model);
+        List<Vehicle> vehiclesByMakeModel = vehicleDaoMySql.getVehiclesByMakeAndModel(make, model);
         if (vehiclesByMakeModel.isEmpty()) {
             System.out.println("There are no vehicles with that make and model...");
         } else {
@@ -173,9 +165,7 @@ public class UserInterface {
     }
 
     // Handles filtering vehicles by year range
-    public void processGetByYearRequest() {
-        Scanner scanner = new Scanner(System.in);
-
+    public void processGetByYearRequest(Scanner scanner) {
         System.out.print("Please enter the minimum year: ");
         String input = scanner.nextLine().trim();
         int min = InputValidation.getPositiveIntegerInput(input); // Get minimum year input
@@ -187,7 +177,7 @@ public class UserInterface {
         if (max == -1) return; // Exit if input is invalid
 
         // Retrieve and display vehicles in the specified year range
-        List<Vehicle> vehiclesByYear = vehicleDAOMySqlImpl.getVehiclesByYearRange(min, max);
+        List<Vehicle> vehiclesByYear = vehicleDaoMySql.getVehiclesByYearRange(min, max);
         if (vehiclesByYear.isEmpty()) {
             System.out.println("There are no vehicles within those years...");
         } else {
@@ -196,14 +186,12 @@ public class UserInterface {
     }
 
     // Handles filtering vehicles by color
-    public void processGetByColorRequest() {
-        Scanner scanner = new Scanner(System.in);
-
+    public void processGetByColorRequest(Scanner scanner) {
         System.out.print("Please enter the color of the vehicle: ");
         String color = scanner.nextLine().trim().toLowerCase(); // Get color input
 
         // Retrieve and display vehicles by color
-        List<Vehicle> vehiclesByColor = vehicleDAOMySqlImpl.getVehiclesByColor(color);
+        List<Vehicle> vehiclesByColor = vehicleDaoMySql.getVehiclesByColor(color);
         if (vehiclesByColor.isEmpty()) {
             System.out.println("There are no vehicles with that color...");
         } else {
@@ -212,9 +200,7 @@ public class UserInterface {
     }
 
     // Handles filtering vehicles by mileage range
-    public void processGetByMileageRequest() {
-        Scanner scanner = new Scanner(System.in);
-
+    public void processGetByMileageRequest(Scanner scanner) {
         System.out.print("Please enter the minimum mileage: ");
         String input = scanner.nextLine().trim();
         int min = InputValidation.getPositiveIntegerInput(input); // Get minimum mileage input
@@ -226,7 +212,7 @@ public class UserInterface {
         if (max == -1) return; // Exit if input is invalid
 
         // Retrieve and display vehicles in the specified mileage range
-        List<Vehicle> vehiclesByMileage = vehicleDAOMySqlImpl.getVehiclesByMileageRange(min, max);
+        List<Vehicle> vehiclesByMileage = vehicleDaoMySql.getVehiclesByMileageRange(min, max);
         if (vehiclesByMileage.isEmpty()) {
             System.out.println("There are no vehicles within that mileage range...");
         } else {
@@ -235,14 +221,12 @@ public class UserInterface {
     }
 
     // Handles filtering vehicles by type
-    public void processGetByVehicleTypeRequest() {
-        Scanner scanner = new Scanner(System.in);
-
+    public void processGetByVehicleTypeRequest(Scanner scanner) {
         System.out.print("Please enter the vehicle type: ");
         String type = scanner.nextLine().trim().toLowerCase(); // Get vehicle type input
 
         // Retrieve and display vehicles by type
-        List<Vehicle> vehiclesByType = vehicleDAOMySqlImpl.getVehiclesByType(type);
+        List<Vehicle> vehiclesByType = vehicleDaoMySql.getVehiclesByType(type);
         if (vehiclesByType.isEmpty()) {
             System.out.println("There are no vehicles with that type...");
         } else {
@@ -251,14 +235,12 @@ public class UserInterface {
     }
 
     // Retrieves and displays all vehicles in the inventory
-    public void processGetAllVehiclesRequest() {
-        displayVehicles(vehicleDAOMySqlImpl.getAllVehicles());
+    public void processGetAllVehiclesRequest(Scanner scanner) {
+        displayVehicles(vehicleDaoMySql.getAllVehicles());
     }
 
     // Handles adding a new vehicle to the dealership
-    public void processAddVehicleRequest() {
-        Scanner scanner = new Scanner(System.in);
-
+    public void processAddVehicleRequest(Scanner scanner) {
         System.out.println("Please enter a vehicle VIN: ");
         String vin = scanner.nextLine(); // Get VIN input
 
@@ -287,26 +269,19 @@ public class UserInterface {
         double price = InputValidation.getPositiveDoubleInput(input); // Get price input
 
         // Add new vehicle to vehicles table
-        vehicleDAOMySqlImpl.addVehicle(vin, year, make, model, type, color, mileage, price, false);
+        vehicleDaoMySql.addVehicle(vin, year, make, model, type, color, mileage, price, false);
 
         System.out.println("Successfully added vehicle with vin #: " + vin);
     }
 
     // Handles removing a vehicle from the dealership
-    public void processRemoveVehicleRequest() {
+    public void processRemoveVehicleRequest(Scanner scanner) {
         System.out.println("Please enter the VIN number of the vehicle to remove from the dealership: ");
-        Scanner scanner = new Scanner(System.in);
-        String vin = scanner.nextLine(); // Get VIN input
+        String vin = scanner.nextLine().trim(); // Get VIN input
 
+        vehicleDaoMySql.removeVehicleByVin(vin);
 
-        //TODO : Remove vehicle from database
-        // Retrieve and remove the vehicle with the specified VIN from the dealership
-        Vehicle filtered = dealership.getAllVehicles().stream()
-                .filter(vehicle -> vehicle.getVin().equalsIgnoreCase(vin)).toList().get(0);
-        dealership.removeVehicle(filtered);
-
-        System.out.println("Successfully removed the vehicle with VIN #" + vin);
-        //new DealershipFileManager().saveDealership(dealership); // Save changes to dealership data
+        System.out.println("Successfully removed the vehicle with VIN #:" + vin);
     }
 
     // Helper methods
@@ -336,8 +311,8 @@ public class UserInterface {
     private void printVehicleListHeader() {
         // Prints the header for the vehicle list
         System.out.println(ColorCodes.GREEN + "\nVehicles\n~~~~~~~~" + ColorCodes.RESET);
-        System.out.printf(ColorCodes.BLUE + "%-21s %-10s %-10s %-10s %-10s %-10s %-15s %5s\n",
-                "VIN", "Make", "Model", "Year", "Type", "Color", "Mileage", "Price");
-        System.out.println("-".repeat(98) + ColorCodes.RESET);
+        System.out.printf(ColorCodes.BLUE + "%-21s %-10s %-10s %-10s %-10s %-10s %-15s %5s %10s\n",
+                "VIN", "Make", "Model", "Year", "Type", "Color", "Mileage", "Price", "Sold");
+        System.out.println("-".repeat(108) + ColorCodes.RESET);
     }
 }

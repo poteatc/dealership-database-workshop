@@ -10,10 +10,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VehicleDAOMySqlImpl implements VehicleDao {
+public class VehicleDaoMySqlImpl implements VehicleDao {
     private final DataSource dataSource;
 
-    public VehicleDAOMySqlImpl(DataSource dataSource) {
+    public VehicleDaoMySqlImpl(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
@@ -262,8 +262,8 @@ public class VehicleDAOMySqlImpl implements VehicleDao {
     @Override
     public void addVehicle(String vin, int year, String make, String model, String vehicleType, String color, int odometer, double price, boolean sold) {
         String query = """
-        insert into vehicles (VIN, year, make, model, vehicle_type, color, mileage, price, sold)
-        values (?,?,?,?,?,?,?,?,?)
+            insert into vehicles (VIN, year, make, model, vehicle_type, color, mileage, price, sold)
+            values (?,?,?,?,?,?,?,?,?)
         """;
 
         try (Connection connection = dataSource.getConnection()) {
@@ -285,8 +285,61 @@ public class VehicleDAOMySqlImpl implements VehicleDao {
         }
     }
 
-        @Override
+    @Override
     public void removeVehicleByVin(String vin) {
+        String query = """
+               delete from vehicles
+               where VIN = ?
+           """;
+        try (Connection connection = dataSource.getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, vin);
+            int rows = preparedStatement.executeUpdate();
+            // confirm the deletion
+            System.out.printf("Rows updated %d\n", rows);
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 
+    @Override
+    public boolean vehicleExists(String vin) {
+        String query = """
+                    select VIN from vehicles
+                    where VIN = ?
+                """;
+        try (Connection connection = dataSource.getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, vin);
+            // confirm the deletion
+            //System.out.printf("Rows updated %d\n", rows);
+            ResultSet rs = preparedStatement.executeQuery();
+            return rs.next();
+
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    @Override
+    public void updateVehicleSoldStatus(String vin) {
+        String query = """
+                    update vehicles
+                    set sold = 1
+                    where VIN = ?
+                """;
+        try (Connection connection = dataSource.getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, vin);
+            // confirm the deletion
+            //System.out.printf("Rows updated %d\n", rows);
+            int rows = preparedStatement.executeUpdate();
+            // confirm the deletion
+            System.out.printf("Rows updated %d\n", rows);
+
+
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }
